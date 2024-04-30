@@ -1,0 +1,15 @@
+/home/pedramos
+/mnt/font/InclusiveSans-Regular/19a/font
+/mnt/9/font/CommitMono-Regular/18a/font
+  0.0000000  19.4791667  47.1093750  79.9739583
+w Newcol Kill Putall Dump Exit Dump redis.dump
+c          0 New Cut Paste Snarf Sort Zerox Delcol 
+c          1 New Cut Paste Snarf Sort Zerox Delcol 
+c          2 New Cut Paste Snarf Sort Zerox Delcol 
+c          3 New Cut Paste Snarf Sort Zerox Delcol 
+f          3           1           0           0   1.6216216 
+          1          54          88           1           1 /home/pedramos/src/plr/gg/redis/ Del Snarf Get | Look 
+F          3           1          23          23   9.3857494          23 
+          5          67          23           0           1 /home/pedramos/src/plr/gg/redis/+startup Del Snarf Undo Put | Look 
+acmego -f
+Watch go test
