@@ -39,9 +39,22 @@ func (p *Peer) readLoop(errs chan error) {
 		if err != nil {
 			errs <- fmt.Errorf("eval raw message error: %s", err)
 		}
-		err = cmd.Exec(p.kv)
+		val, err := cmd.Exec(p.kv)
 		if err != nil {
 			panic("TODO: must handle error")
+		}
+		if val != nil {
+			if err := p.WriteVal(val); err != nil {
+				slog.Warn(
+					"failed to msg to client",
+					"warn",
+					err,
+					"cmd",
+					cmd.Stmt(),
+				)
+				p.Errorf("failed to msg to client, responding to cmd `%s` :%s", cmd.Stmt(), err)
+			}
+			continue
 		}
 		p.WriteOk()
 	}
@@ -49,6 +62,17 @@ func (p *Peer) readLoop(errs chan error) {
 
 func (p *Peer) WriteOk() error {
 	_, err := p.conn.Write([]byte("+OK\r\n"))
+	return err
+}
+
+func (p *Peer) WriteVal(val any) error {
+	_, err := p.conn.Write([]byte(fmt.Sprintf("+%v\r\n", val)))
+	return err
+}
+
+func (p *Peer) Errorf(msg string, args ...any) error {
+	errStr := fmt.Sprintf(msg, args...)
+	_, err := p.conn.Write([]byte(fmt.Sprintf("-%s\r\n", errStr)))
 	return err
 }
 

@@ -10,23 +10,29 @@ import (
 
 type Command interface {
 	Stmt() string
-	Exec(StorageEngine) error
+	Exec(StorageEngine) (any, error)
 }
 
 const (
-	setCmdStmt = "set"
-	getCmdStmt = "get"
+	setCmdStmt   = "set"
+	getCmdStmt   = "get"
+	helloCmdStmt = "hello"
 )
 
 type SetCommand struct{ key, val string }
 
-func (c SetCommand) Stmt() string                { return setCmdStmt }
-func (c SetCommand) Exec(kv StorageEngine) error { kv.Set(c.key, c.val); return nil }
+func (c SetCommand) Stmt() string                       { return setCmdStmt }
+func (c SetCommand) Exec(kv StorageEngine) (any, error) { err := kv.Set(c.key, c.val); return nil, err }
 
 type GetCommand struct{ key string }
 
-func (c GetCommand) Stmt() string                { return getCmdStmt }
-func (c GetCommand) Exec(kv StorageEngine) error { kv.Get(c.key); return nil }
+func (c GetCommand) Stmt() string                       { return getCmdStmt }
+func (c GetCommand) Exec(kv StorageEngine) (any, error) { return kv.Get(c.key) }
+
+type HelloCommand struct{}
+
+func (c HelloCommand) Stmt() string                      { return helloCmdStmt }
+func (c HelloCommand) Exec(_ StorageEngine) (any, error) { return "hello", nil }
 
 func parseCommand(raw []byte) (Command, error) {
 	rd := resp.NewReader(bytes.NewReader(raw))

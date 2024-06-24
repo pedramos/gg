@@ -41,7 +41,7 @@ func (c Client) Set(ctx context.Context, key, val string) error {
 	return nil
 }
 
-func (c Client) Get(ctx context.Context, key string) error {
+func (c Client) Get(ctx context.Context, key string) (string, error) {
 	var buf bytes.Buffer
 	wr := resp.NewWriter(&buf)
 	wr.WriteArray([]resp.Value{
@@ -50,18 +50,15 @@ func (c Client) Get(ctx context.Context, key string) error {
 	})
 
 	if _, err := buf.WriteTo(c); err != nil {
-		return fmt.Errorf("failed to write to %s: %w", c.RemoteAddr(), err)
+		return "", fmt.Errorf("failed to write to %s: %w", c.RemoteAddr(), err)
+	}
+	rd := resp.NewReader(c)
+	v, _, err := rd.ReadValue()
+	if err != nil {
+		return "", fmt.Errorf("failed to read %s: %w", key, err)
 	}
 
-	_, isOK, err := c.ReadOK()
-	if err != nil {
-		return fmt.Errorf("set operation did not return ok: %s", err)
-	}
-	if !isOK {
-		return fmt.Errorf("set operation failled")
-	}
-	// fmt.Println("Set done")
-	return nil
+	return fmt.Sprintf("%s", v), nil
 }
 
 func (c *Client) ReadOK() ([]byte, bool, error) {

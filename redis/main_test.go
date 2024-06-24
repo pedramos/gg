@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"testing"
 
 	"plramos.win/gg/redis/client"
@@ -25,7 +26,18 @@ func TestServer(t *testing.T) {
 			if err != nil {
 				t.Errorf("failed to create client: %s", err)
 			}
-			c.Set(ctx, "leader", "Charlie")
+			err = c.Set(ctx, "leader", "Charlie")
+			if err != nil {
+				t.Errorf("failed to execute set cmd: %s", err)
+			}
+			val, err := c.Get(ctx, "leader")
+			if err != nil {
+				t.Errorf("failed to execute get cmd: %s", err)
+			}
+			if fmt.Sprintf("%v", val) != "Charlie" {
+				t.Errorf("exected `Charlie` and got %s", fmt.Sprintf("%v", val))
+			}
+
 		},
 	}
 
